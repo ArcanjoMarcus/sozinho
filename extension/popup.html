@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: sans-serif;
+        width: 250px;
+      }
+      #chat {
+        height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+        padding: 4px;
+        font-size: 12px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input id="pass" type="password" placeholder="Enter pass" />
+    <button id="connect">Connect</button>
+
+    <div id="chat"></div>
+
+    <input id="msg" type="text" placeholder="Type message" />
+    <button id="send">Send</button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

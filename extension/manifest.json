@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Sozinho Chat",
+  "version": "1.0",
+  "description": "Simple private chat via WebSocket",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "wss://sozinho.onrender.com/*"
+  ]
+}

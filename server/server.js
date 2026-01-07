@@ -1,13 +1,16 @@
 import { WebSocketServer } from "ws";
 
 const PORT = process.env.PORT;
-const API_KEY = process.env.CHAT_API_KEY;
+const PASS = process.env.PASS;
+
+if (!PASS) {
+  throw new Error("PASS environment variable not set");
+}
 
 const wss = new WebSocketServer({ port: PORT });
-const rooms = new Map();
+const clients = new Set();
 
-wss.on("connection", (ws, req) => {
-  let room = null;
+wss.on("connection", (ws) => {
   let authorized = false;
 
   ws.on("message", (raw) => {
@@ -18,13 +21,14 @@ wss.on("connection", (ws, req) => {
       return;
     }
 
-    // 1. Authenticate
+    // Authentication
     if (msg.type === "auth") {
-      if (msg.key === API_KEY) {
+      if (msg.pass === PASS) {
         authorized = true;
         ws.send(JSON.stringify({ type: "auth_ok" }));
+        clients.add(ws);
       } else {
-        ws.close(4001, "Invalid API key");
+        ws.close(4001, "Invalid pass");
       }
       return;
     }
@@ -34,17 +38,9 @@ wss.on("connection", (ws, req) => {
       return;
     }
 
-    // 2. Join room
-    if (msg.type === "join") {
-      room = msg.room;
-      if (!rooms.has(room)) rooms.set(room, new Set());
-      rooms.get(room).add(ws);
-      return;
-    }
-
-    // 3. Chat message
-    if (msg.type === "chat" && room) {
-      for (const client of rooms.get(room)) {
+    // Chat message
+    if (msg.type === "chat") {
+      for (const client of clients) {
         if (client.readyState === 1) {
           client.send(JSON.stringify({
             from: msg.from,
@@ -57,10 +53,8 @@ wss.on("connection", (ws, req) => {
   });
 
   ws.on("close", () => {
-    if (room && rooms.has(room)) {
-      rooms.get(room).delete(ws);
-    }
+    clients.delete(ws);
   });
 });
 
-console.log("Chat server running");
+console.log("Chat server running on Render");
